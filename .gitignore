@@ -1,0 +1,11 @@
+# folder
+data
+logs
+__pycache__
+# file
+device.json
+config.yml
+config.toml
+session.token
+# code
+test.ipynb
