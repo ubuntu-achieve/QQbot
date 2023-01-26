@@ -28,25 +28,3 @@ class send_test(Plugin):
         if self.event.type != "message":
             return False
         return str(self.event.message).lower() == "hello"
-
-class send_at_test(Plugin):
-    '''
-    在被@之后自动回复
-    '''
-    priority:int = 0
-    block:bool   = False
-    async def handle(self) -> None:
-        # msg = CQHTTPMessage()
-        with open("event.txt", "a") as f:
-            f.write(str(self.event.user_id)+"("+str(self.event.message_type)+")"+":"+str(self.event.raw_message)+"\n")
-        msg = CQHTTPMessage()
-        msg += CQHTTPMessageSegment.at(self.event.user_id)
-        msg += CQHTTPMessageSegment.text("没事不要@我，烦内～")
-        await self.event.reply(msg)
-
-    async def rule(self) -> bool:
-        if self.event.adapter.name != "cqhttp":
-            return False
-        if self.event.type != "message":
-            return False
-        return "[CQ:at,qq=439183872]" == str(self.event.raw_message).replace(" ", "")

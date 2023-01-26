@@ -21,8 +21,6 @@ class up_live_reminder(Plugin):
     priority:int  = 0
     block:bool    = False
     async def handle(self) -> None:
-        # 是否提醒过了
-        reminded:bool = self.bot.config.reminded
         # 爬取信息
         info = requests.get(cfg.live_status_url, headers=cfg.headers)
         info_js = json.loads(info.content.decode())
@@ -37,8 +35,17 @@ class up_live_reminder(Plugin):
         #直播链接
         live_url    = info_js["data"]["live_room"]["url"]
         if str(live_status) == "0":  # 若未开播则不做任何操作，并将reminded设置为未提醒过
+            if self.bot.config.reminded == "True": # 若未开播但是提醒过了，说明已经下播了
+                msg = CQHTTPMessage()
+                msg += CQHTTPMessageSegment.text(f"\t{live_name}  下啵啦！")
+                await self.bot.get_adapter("cqhttp").send(
+                    msg,
+                    # todo
+                    message_type="group",
+                    id_=cfg.group_id
+                )
             self.bot.config.reminded = "False"
-        elif reminded == "False":  # 如果开播了，且没有提醒过，则做出提醒
+        elif self.bot.config.reminded == "False":  # 如果开播了，且没有提醒过，则做出提醒
             msg = CQHTTPMessage()
             msg += CQHTTPMessageSegment.text(f"\t{live_name}  开啵啦！\n\t{live_title}\n前往链接：{live_url}")
 
@@ -77,11 +84,7 @@ class up_live_ask(Plugin):
             msg += CQHTTPMessageSegment.text(f"还没有开播哦(上次检测时间：{strftime('%Y-%m-%d %H:%M:%S', localtime())})")
         else:
             msg += CQHTTPMessageSegment.text(f"\t{live_name}  开啵啦！\n\t{live_title}\n前往链接：{live_url}")
-        await self.bot.get_adapter("cqhttp").send(
-            msg,
-            message_type="group",
-            id_=cfg.group_id
-        )
+        await self.event.reply(msg)
     
     async def rule(self) -> bool:
         if self.event.adapter.name != "cqhttp":

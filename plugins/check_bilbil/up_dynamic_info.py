@@ -12,7 +12,7 @@ cfg = config()
 
 ########## 动态检测 ##########
 @scheduler_decorator(
-    trigger="interval", trigger_args={"seconds": 60}, override_rule=True
+    trigger="interval", trigger_args={"seconds": 180}, override_rule=True
 )
 class up_dynamic_reminder(Plugin):
     """
@@ -41,7 +41,7 @@ class up_dynamic_reminder(Plugin):
             dynamic_info[str(dynamic_index)] = [dynamic_time, dynamic_txt]
             # print(f"{up_name}在{dynamic_time}发布的动态\n{dynamic_txt}")
         # 判断是否更新
-        if dynamic_info != dynamic_info_old:
+        if new_txt != dynamic_info_old[next(iter(dynamic_info_old.keys()))][-1]:
             # 如果更新则重新写入本地文件
             with open("dynamic_info.json", "w") as f:
                 f.write(json.dumps(dynamic_info))
@@ -78,11 +78,7 @@ class up_dynamic_ask(Plugin):
             if "最近" in str(self.event.message) and index == 0:
                 break
         msg += CQHTTPMessageSegment.text(f"前往链接：{cfg.dynamic_pub_url}")
-        await self.bot.get_adapter("cqhttp").send(
-            msg,
-            message_type="group",
-            id_=cfg.group_id
-        )
+        await self.event.reply(msg)
     
     async def rule(self) -> bool:
         if self.event.adapter.name != "cqhttp":
@@ -123,11 +119,7 @@ class up_dynamic_ask_save(Plugin):
                     msg += CQHTTPMessageSegment.text(f"\t{index+1}({dynamic_info_old[dynamic_index][0]}):自己看！检测不出来\n")
             if "最近" in str(self.event.message) and index == 0:
                 break
-        await self.bot.get_adapter("cqhttp").send(
-            msg,
-            message_type="group",
-            id_=cfg.group_id
-        )
+        await self.event.reply(msg)
     
     async def rule(self) -> bool:
         if self.event.adapter.name != "cqhttp":
