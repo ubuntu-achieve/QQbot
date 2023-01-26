@@ -1,0 +1,7 @@
+alicebot
+alicebot-adapter-cqhttp
+alicebot-adapter-mirai
+alicebot-adapter-dingtalk
+alicebot-adapter-apscheduler
+requests
+jieba
