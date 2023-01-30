@@ -4,9 +4,14 @@ image
 logs
 __pycache__
 # file
-device.json
+event.txt
 config.yml
 config.toml
+device.json
+info_js.json
+alicebot.log
 session.token
+dynamic_info.json
 # code
 test.ipynb
+tmp.json

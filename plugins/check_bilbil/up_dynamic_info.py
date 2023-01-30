@@ -1,6 +1,5 @@
 import json
 import requests
-from time import strftime, localtime
 
 from alicebot import Plugin
 from alicebot.adapter.apscheduler import scheduler_decorator
@@ -62,7 +61,7 @@ class up_dynamic_ask(Plugin):
     有人询问UP主动态时给出反馈
     """
     priority:int = 0
-    block:bool   = False
+    block:bool   = True  # 停止传播，防止对其他回复模块造成干扰
     # 自定义变量，用于判断是否更新
     update:bool  = False
     async def handle(self) -> None:
@@ -85,7 +84,7 @@ class up_dynamic_ask(Plugin):
             return False
         if self.event.type != "message":
             return False
-        if "[CQ:at,qq=439183872]" in str(self.event.raw_message):
+        if f"[CQ:at,qq={self.bot.config.botuid}]" in str(self.event.raw_message):
             if "动态" in str(self.event.message) and "省流" not in str(self.event.message):
                 return True
 
@@ -94,7 +93,7 @@ class up_dynamic_ask_save(Plugin):
     有人询问UP主省流动态时给出反馈
     """
     priority:int = 0
-    block:bool   = False
+    block:bool   = True  # 停止传播，防止对其他回复模块造成干扰
     # 自定义变量，用于判断是否更新
     update:bool  = False
     async def handle(self) -> None:
@@ -104,7 +103,7 @@ class up_dynamic_ask_save(Plugin):
         
         # 发出通知
         msg = CQHTTPMessage()
-        msg += CQHTTPMessageSegment.text(f"前往链接：{cfg.dynamic_pub_url}")
+        msg += CQHTTPMessageSegment.text(f"前往链接：{cfg.dynamic_pub_url}\n")
         msg += CQHTTPMessageSegment.text(f"动态列表：\n")
         for index, dynamic_index in enumerate(dynamic_info_old.keys()):
             for gus in cfg.gugu:
@@ -126,7 +125,7 @@ class up_dynamic_ask_save(Plugin):
             return False
         if self.event.type != "message":
             return False
-        if "[CQ:at,qq=439183872]" in str(self.event.raw_message):
+        if f"[CQ:at,qq={self.bot.config.botuid}]" in str(self.event.raw_message):
             if "动态" in str(self.event.message) and "省流" in str(self.event.message):
                 with open("event.txt", 'a') as f:
                     f.write("======="+str(self.event.message)+"=======\n")

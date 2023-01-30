@@ -12,14 +12,14 @@ cfg = config()
 
 ########## 直播检测 ##########
 @scheduler_decorator(
-    trigger="interval", trigger_args={"seconds": 30}, override_rule=True
+    trigger="interval", trigger_args={"seconds": 60}, override_rule=True
 )
 class up_live_reminder(Plugin):
     '''
     定时检测主播开播情况，若检测到开播则发送提示信息
     '''
-    priority:int  = 0
-    block:bool    = False
+    priority:int = 0
+    block:bool   = False
     async def handle(self) -> None:
         # 爬取信息
         info = requests.get(cfg.live_status_url, headers=cfg.headers)
@@ -65,7 +65,7 @@ class up_live_ask(Plugin):
     当检测到有人询问直播情况时，进行反馈
     """
     priority:int = 0
-    block:bool   = False
+    block:bool   = True  # 停止传播，防止对其他回复模块造成干扰
     async def handle(self) -> None:
         # 爬取信息
         info = requests.get(cfg.live_status_url, headers=cfg.headers)
@@ -91,7 +91,7 @@ class up_live_ask(Plugin):
             return False
         if self.event.type != "message":
             return False
-        if "[CQ:at,qq=439183872]" in str(self.event.raw_message):
+        if f"[CQ:at,qq={self.bot.config.botuid}]" in str(self.event.raw_message):
             if "直播" in str(self.event.message) or "啵" in str(self.event.message):
                 with open("event.txt", 'a') as f:
                     f.write("======="+str(self.event.message)+"=======\n")
