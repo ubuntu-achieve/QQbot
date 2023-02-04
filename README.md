@@ -1,6 +1,6 @@
 # 好耶bot: 一个综合性的QQ机器人
 
-==好耶bot== 基于[Alicebot](https://github.com/st1020/alicebot)开发，集成了多功能：
+好耶bot 基于[Alicebot](https://github.com/st1020/alicebot)开发，集成了多功能：
 
 - B站UP主直播状态提醒
 - B站UP主动态更新提醒
