@@ -12,5 +12,6 @@ device.json
 info_js.json
 session.token
 dynamic_info.json
+plugins\chatgpt\config.py
 # code
 test.ipynb
