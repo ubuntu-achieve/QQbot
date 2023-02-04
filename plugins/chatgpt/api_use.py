@@ -1,3 +1,4 @@
+import os
 import json
 import requests
 
@@ -12,12 +13,16 @@ class chatGPT_api_use(Plugin):
     '''
     调用ChatGPT的api实现智能交流
     '''
-    priority:int = 0
+    priority:int = 1
     block:bool   = True  # 阻断事件向下传播
     async def handle(self) -> None:
         user_info = {}
-        with open("user.json", "r") as f:
-            user_info_old = json.load(f)
+        with open(os.path.join(self.bot.config.tmp_dir, "user.json"), "r") as f:
+            # 若user.json为空会报错，这里加上一个验证
+            try:
+                user_info_old = json.load(f)
+            except:
+                user_info_old = {}
         msg = CQHTTPMessage()
         # 判断接口是否被人占用
         if self.bot.config.ask_state == "False":
@@ -30,7 +35,7 @@ class chatGPT_api_use(Plugin):
                 user_info["id"] = str(self.event.user_id)
                 user_info["len"] = str(0)
                 # 写入使用用户信息
-                with open("user.json", "w") as f:
+                with open(os.path.join(self.bot.config.tmp_dir, "user.json"), "w") as f:
                     f.write(json.dumps(user_info))
                 msg += CQHTTPMessageSegment.text(cfg.prompt_b)
                 # 是占用者访问
@@ -53,7 +58,7 @@ class chatGPT_api_use(Plugin):
                     # 统计回复的字数
                     user_info["len"] = str(int(user_info["len"]) + len(str(resp["choices"][0]["text"].strip())))
                     # 写入文件
-                    with open("user.json", "w") as f:
+                    with open(os.path.join(self.bot.config.tmp_dir, "user.json"), "w") as f:
                         f.write(json.dumps(user_info))
                     msg += CQHTTPMessageSegment.text(cfg.prompt_m)
                     msg += CQHTTPMessageSegment.text("A:"+str(resp["choices"][0]["text"].strip()))
@@ -99,7 +104,7 @@ class chatGPT_api_use(Plugin):
                         # 统计回复的字数
                         user_info_old["len"] = str(int(user_info_old["len"]) + len(str(resp["choices"][0]["text"].strip())))
                         # 写入文件
-                        with open("user.json", "w") as f:
+                        with open(os.path.join(self.bot.config.tmp_dir, "user.json"), "w") as f:
                             f.write(json.dumps(user_info_old))
                         msg += CQHTTPMessageSegment.text(cfg.prompt_m)
                         msg += CQHTTPMessageSegment.text("A:"+str(resp["choices"][0]["text"].strip())+"\n")

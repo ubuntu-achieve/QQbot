@@ -20,6 +20,6 @@ class config():
         'user-agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
     }
     # 需通知群的群号
-    group_id = 310810991
+    group_id = 590379047
     # 咕咕关键字，通过它对UP主动态内容是否咕咕进行检测，咕咕关键字中的元组只能有两个元素
     gugu = ["晚咕",("有", "事情"), "请假", "请个假", "咕", "拖延"]

@@ -1,7 +1,8 @@
 # folder
 go-cqhttp
 image
-logs
+log
+tmp
 __pycache__
 # file
 event.txt
@@ -9,9 +10,7 @@ config.yml
 config.toml
 device.json
 info_js.json
-alicebot.log
 session.token
 dynamic_info.json
 # code
 test.ipynb
-tmp.json

@@ -1,4 +1,5 @@
 import re
+import os
 import json
 
 from alicebot import Plugin
@@ -20,32 +21,12 @@ class msg_reply(Plugin):
     """
     priority:int = 1
     block:bool   = False
-    key_img_path = {
-        "色图":"file:///data/bot/image/色图.jpg",
-        "睡觉":"file:///data/bot/image/睡觉.jpg",
-        "问候":"file:///data/bot/image/问候.jpg",
-        "造反":"file:///data/bot/image/造反.gif",
-    }
-    tfn_img_path = {
-        "处男":"file:///data/bot/image/face/处男.png",
-        "打工":"file:///data/bot/image/face/打工.jpg",
-        "得意":"file:///data/bot/image/face/得意.png",
-        "害怕":"file:///data/bot/image/face/害怕.png",
-        "好耶":"file:///data/bot/image/face/好耶.png",
-        "红包":"file:///data/bot/image/face/红包.png",
-        "看戏":"file:///data/bot/image/face/看戏.jpg",
-        "生气":"file:///data/bot/image/face/生气.jpg",
-        "唐门":"file:///data/bot/image/face/唐门.jpg",
-        "细狗":"file:///data/bot/image/face/细狗.png",
-        "虾":"file:///data/bot/image/face/虾.gif",
-        "小丑":"file:///data/bot/image/face/小丑.jpg",
-        "蜘蛛":"file:///data/bot/image/face/蜘蛛.gif",
-        "gun":"file:///data/bot/image/face/gun.jpg",
-    }
+    key_img_path = {file_name[:-4]:"file:///data/bot/image/key/"+file_name for file_name in sorted(os.listdir("./image/key/"), reverse=True)}
+    tfn_img_path = {file_name[:-4]:"file:///data/bot/image/face/"+file_name for file_name in sorted(os.listdir("./image/face/"), reverse=True)}
     match_exp = ["你(.*?)我吗", "说(.*?)我", "帮我(.)(.*?)"]
     async def handle(self) -> None:
         # msg = CQHTTPMessage()
-        with open("event.txt", "a") as f:
+        with open(os.path.join(self.bot.config.tmp_dir, "event.txt"), "a") as f:
             f.write(str(self.event.user_id)+"("+str(self.event.message_type)+")"+":"+str(self.event.raw_message)+"\n")
         # 1. @回复
         if str(self.event.message).replace(" ", "") == f"[CQ:at,qq={self.bot.config.botuid}]":
@@ -95,13 +76,14 @@ class msg_reply(Plugin):
  2. 动态内容获取：通过发送“@好耶bot+动态”获取全部动态、发送“@好耶bot+最近+动态”获取最近一条动态(stable)；\n\
  3. 省流功能：在动态内容获取语法的任意位置添加省流，即可触发功能，例如：“@好耶bot 最近动态省流”(preview)；\n\
  4. 糖芙尼表情包：通过发送“@好耶bot 糖芙尼”了解使用方法(stable)；\n\
- 5. 基本问答功能：通过“@好耶bot+任意内容”触发，目前仅实现少量问答模板(preview)；\n\
- 6. 关键字回答：通过“@好耶bot+任意包含关键字的内容”，目前关键字有“色图”、“睡觉”、“问候”、“造反”(preview)\n\
- 7. 智能对话模式：通过“Q:+欲询问内容”开启，输入“!q”结束智能对话模式【管理员可输入“强制解除”以解除占用】(preview)\n\
-（注：该列表通过发送“@好耶bot 功能列表”或“@好耶bot help”获取）"
+ 5. 查看周表：通过发送“@好耶bot 周表”获取周表和当日内容，\n\
+ 6. 基本问答功能：通过“@好耶bot+任意内容”触发，目前仅实现少量问答模板(preview)；\n\
+ 7. 关键字回答：通过“@好耶bot+任意包含关键字的内容”，目前关键字有“色图”、“睡觉”、“问候”、“造反”(preview)\n\
+ 8. 智能对话模式：通过“Q:+欲询问内容”开启，输入“!q”结束智能对话模式\n\
+（注：该列表通过发送“@好耶bot 功能列表”或“@好耶bot help”获取，对于2、3、5号功能，可以通过添加“更新”词条获取最新内容）"
                 )
         elif "强制解除" in str(self.event.message):
-            with open("user.json", "r") as f:
+            with open(os.path.join(self.bot.config.tmp_dir, "user.json"), "r") as f:
                 user_info_old = json.load(f)
             msg = CQHTTPMessage()
             # 解除权限判断

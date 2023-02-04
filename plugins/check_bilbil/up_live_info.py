@@ -1,3 +1,4 @@
+import os
 import json
 import requests
 from time import strftime, localtime
@@ -6,7 +7,7 @@ from alicebot import Plugin
 from alicebot.adapter.apscheduler import scheduler_decorator
 from alicebot.adapter.cqhttp.message import CQHTTPMessage, CQHTTPMessageSegment
 
-from .config import config
+from .utils import config
 
 cfg = config()
 
@@ -24,7 +25,7 @@ class up_live_reminder(Plugin):
         # 爬取信息
         info = requests.get(cfg.live_status_url, headers=cfg.headers)
         info_js = json.loads(info.content.decode())
-        with open("tmp.json", "w") as f:
+        with open(os.path.join(self.bot.config.tmp_dir, "tmp.json"), "w") as f:
             f.write(info.content.decode())
         # 主播名称
         live_name   = info_js["data"]["name"]
@@ -93,7 +94,6 @@ class up_live_ask(Plugin):
             return False
         if f"[CQ:at,qq={self.bot.config.botuid}]" in str(self.event.raw_message):
             if "直播" in str(self.event.message) or "啵" in str(self.event.message):
-                with open("event.txt", 'a') as f:
+                with open(os.path.join(self.bot.config.tmp_dir, "event.txt"), 'a') as f:
                     f.write("======="+str(self.event.message)+"=======\n")
                 return True
-

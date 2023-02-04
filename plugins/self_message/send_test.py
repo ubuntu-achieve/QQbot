@@ -1,3 +1,5 @@
+import os
+
 from alicebot import Plugin
 from alicebot.adapter.cqhttp.message import CQHTTPMessage, CQHTTPMessageSegment
 
@@ -18,7 +20,7 @@ class send_test(Plugin):
     block:bool   = False
     async def handle(self) -> None:
         # msg = CQHTTPMessage()
-        with open("event.txt", "a") as f:
+        with open(os.path.join(self.bot.config.tmp_dir, "event.txt"), "a") as f:
             f.write(str(self.event.user_id)+"("+str(self.event.message_type)+")"+":"+str(self.event.message)+"\n")
         await self.event.reply("success~")
 
