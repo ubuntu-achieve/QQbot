@@ -22,8 +22,24 @@ class up_dynamic_reminder(Plugin):
     priority:int = 0
     block:bool   = False
     async def handle(self) -> None:
+        # 如果停止爬取次数大于0则不进行爬取
+        if self.bot.config.stop_get > 0:
+            # 每停止一次爬取，停止次数-1
+            self.bot.config.stop_get -= 1
+            msg = CQHTTPMessage()
+            msg += CQHTTPMessageSegment.text(f"停止爬取,还将停止{self.bot.config.stop_get}次")
+            await self.bot.get_adapter("cqhttp").send(
+                msg,
+                message_type="private",
+                id_=1852199699
+            )
+            return 0
         # 爬取信息
         up_name, dynamic_info = up_dynamic_get(cfg.dynamic_url, cfg.headers, cfg.connect_time_out, cfg.read_time_out, self.bot.config.tmp_dir)
+        # 如果访问超时，则在30分钟内不再进行爬取
+        if up_name == 0 and dynamic_info == 0:
+            self.bot.config.stop_get = 10
+            return 0
         # 读取以前存储的数据
         with open(os.path.join(self.bot.config.tmp_dir, "dynamic_info.json"), "r") as f:
             # 若user.json为空会报错，这里加上一个验证
@@ -35,7 +51,10 @@ class up_dynamic_reminder(Plugin):
         if dynamic_info != dynamic_info_old:
             # 发出通知
             msg = CQHTTPMessage()
-            msg += CQHTTPMessageSegment.text(f"{up_name}在{dynamic_info[next(iter(dynamic_info.keys()))][1]}发布了动态！\n{dynamic_info[next(iter(dynamic_info.keys()))][1]}\n前往链接：{cfg.dynamic_pub_url}")
+            msg += CQHTTPMessageSegment.text(f"{up_name}在{dynamic_info[next(iter(dynamic_info.keys()))][0]}发布了动态！\n{dynamic_info[next(iter(dynamic_info.keys()))][1]}\n前往链接：{cfg.dynamic_pub_url}")
+            # 将数据写入文件
+            with open(os.path.join(self.bot.config.tmp_dir, "dynamic_info.json"), "w") as f:
+                json.dump(dynamic_info, f)
             await self.bot.get_adapter("cqhttp").send(
                 msg,
                 message_type="group",

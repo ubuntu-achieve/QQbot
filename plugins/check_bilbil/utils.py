@@ -42,10 +42,12 @@ def up_dynamic_get(url, headers, connect_time_out, read_time_out, tmp_path=None)
     connect_time_out:连接超时时间
     read_time_out:读取超时时间
     tmp_path:存储临时文件的位置,若值为None则不存储
-    return:up主的名字,解析后的动态信息
+    return:up主的名字,解析后的动态信息(若返回值为0, 0则说明解析超时, 需要暂停访问)
     """
     # 爬取信息
     info = requests.get(url, headers=headers, timeout=(connect_time_out, read_time_out))
+    if info.status_code != 200 :
+        return 0, 0
     info_js = json.loads(info.content.decode())
     if tmp_path != None:
         # 存储原始文件到临时文件夹

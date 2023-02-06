@@ -1,6 +1,6 @@
 class config():
     # ChatGPT的api密钥
-    api_key  = "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"
+    api_key  = "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"
     # ChatGPT访问网址
     api_url  = "https://api.openai.com/v1/completions"
     # 欢迎语

@@ -6,4 +6,3 @@ alicebot-adapter-apscheduler
 requests
 jieba
 bs4
-# 周表功能，需要PaddleOCR环境，根据官方仓库（https://github.com/PaddlePaddle/PaddleOCR）引导安装即可
